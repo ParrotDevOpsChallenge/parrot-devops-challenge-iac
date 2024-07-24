@@ -1,138 +1,108 @@
 
-# Parrot DevOps Challenge IAC
+# Parrot DevOps Challenge IaC Project Documentation
 
-This repository contains the Terraform configurations for the `parrot-devops-challenge-iac` project. The Makefile included provides various commands to manage and deploy the infrastructure.
+## Introduction
 
-## Commands
+The Parrot DevOps Challenge project is designed to automate and deploy a backend API using Terraform for Infrastructure as Code (IaC). The project involves creating a CI/CD pipeline, deploying services on AWS ECS, managing secrets, and setting up a frontend using S3 and CloudFront. This document provides an overview of the project's structure, key components, and the Terraform configurations used.
 
-### `make init`
-Command to initialize the Terraform project using Docker.
+## Project Structure
 
-```bash
-make init
-```
+The project is organized into several Terraform configuration files, each responsible for different aspects of the infrastructure:
 
-### `make get-secrets`
-Command to fetch secrets.
+### 1. Networking Configuration (`networking.tf`)
+This configuration sets up the VPC, subnets, internet gateway, and NAT gateway.
 
-```bash
-make get-secrets
-```
+- **VPC**: Defines the Virtual Private Cloud for the project.
+- **Subnets**: Includes public and private subnets distributed across availability zones.
+- **Internet Gateway**: Allows communication between the VPC and the internet.
+- **NAT Gateway**: Provides internet access for resources in the private subnets.
+- **Route Tables**: Configures routing for the public and private subnets.
 
-### `make commit`
-Command to get commit information.
+### 2. ECS Configuration (`ecs.tf`)
+This configuration sets up the ECS cluster and associated IAM roles.
 
-```bash
-make commit
-```
+- **ECS Cluster**: Defines the ECS cluster to run containerized applications.
+- **IAM Roles**: Includes roles and policies necessary for ECS task execution.
+- **Security Groups**: Manages network access to ECS services.
 
-### `make plan`
-Command to plan the Terraform changes.
+### 3. Hello World Service (`hello_world.tf`)
+This configuration sets up the ECS service for the hello-world application, the related load balancer, and security groups.
 
-```bash
-make plan
-```
+- **ECS Task Definition**: Defines the task for the hello-world application.
+- **ECS Service**: Manages the deployment and scaling of the hello-world task.
+- **Load Balancer**: Distributes traffic to the ECS service.
+- **Security Groups**: Ensures secure access to the ECS service.
 
-### `make apply`
-Command to apply the Terraform changes.
+### 4. Parrot DevOps Challenge API (`parrot_devops_challenge_api.tf`)
+This configuration sets up the ECS service for the main API, the related load balancer, security groups, and the ECR repository.
 
-```bash
-make apply
-```
+- **ECR Repository**: Stores Docker images for the API.
+- **ECS Task Definition**: Defines the task for the main API.
+- **ECS Service**: Manages the deployment and scaling of the API task.
+- **Load Balancer**: Distributes traffic to the API service.
+- **Security Groups**: Ensures secure access to the API service.
 
-### `make refresh`
-Command to refresh the Terraform state.
+### 5. Parrot WebApp (`parrot_webapp.tf`)
+This configuration sets up the S3 bucket and CloudFront distribution for the frontend.
 
-```bash
-make refresh
-```
+- **S3 Bucket**: Stores the frontend static files.
+- **CloudFront Distribution**: Provides a CDN for the frontend, ensuring fast delivery of content.
+- **Bucket Policies**: Manages access control for the S3 bucket.
 
-### `make destroy`
-Command to destroy the Terraform-managed infrastructure.
+### 6. Jenkins Configuration (`jenkins.tf`)
+This configuration sets up the bastion server (Jenkins host).
 
-```bash
-make destroy
-```
+- **Security Group**: Manages access to the Jenkins server.
+- **EC2 Instance**: Defines the Jenkins server.
 
-### `make graph`
-Command to generate a graph of the Terraform-managed infrastructure.
+### 7. RDS Configuration (`rds.tf`)
+This configuration sets up the RDS PostgreSQL instance.
 
-```bash
-make graph
-```
+- **Security Group**: Manages access to the RDS instance.
+- **RDS Instance**: Defines the PostgreSQL database.
+- **Subnet Group**: Specifies the subnets for the RDS instance.
 
-## Makefile Explanation
+## Makefile
 
-- **Variables:**
-  - `ENV`: The environment to use (default is `local`).
-  - `ENV_FILE_PATH`: The path to the environment-specific secrets file.
-  - `DOCKER_IMAGE`: The Docker image to use for running Terraform (`hashicorp/terraform:latest`).
-  - `DOCKER_RUN`: The Docker run command with the specified environment and volume settings.
+The Makefile provides commands to initialize and manage the Terraform project. Here are the key commands:
 
-- **Targets:**
-  - `init`: Initializes the Terraform project.
-  - `get-secrets`: Fetches secrets required for the project.
-  - `commit`: Retrieves commit information.
-  - `plan`: Plans the Terraform changes.
-  - `apply`: Applies the Terraform changes.
-  - `refresh`: Refreshes the Terraform state.
-  - `destroy`: Destroys the Terraform-managed infrastructure.
-  - `graph`: Generates a visual graph of the Terraform-managed infrastructure.
+- `init`: Initializes the Terraform project.
+- `get-secrets`: Fetches necessary secrets.
+- `commit`: Retrieves commit information.
+- `plan`: Plans the Terraform changes.
+- `apply`: Applies the Terraform changes.
+- `refresh`: Refreshes the Terraform state.
+- `destroy`: Destroys the Terraform-managed infrastructure.
+- `graph`: Generates a dependency graph of the infrastructure.
 
-## Usage
+## Deployment Steps
 
-1. **Initialize the Terraform project:**
-
-   This should be the first command you run.
-
-   ```bash
+1. **Initialize the Terraform Project**:
+   ```sh
    make init
    ```
 
-2. **Fetch secrets:**
-
-   Retrieve the necessary secrets for the project.
-
-   ```bash
+2. **Fetch Secrets**:
+   ```sh
    make get-secrets
    ```
 
-3. **Plan the Terraform changes:**
-
-   Review the changes that Terraform will make to the infrastructure.
-
-   ```bash
+3. **Plan the Terraform Changes**:
+   ```sh
    make plan
    ```
 
-4. **Apply the Terraform changes:**
-
-   Apply the planned changes to the infrastructure.
-
-   ```bash
+4. **Apply the Terraform Changes**:
+   ```sh
    make apply
    ```
 
-5. **Refresh the Terraform state:**
-
-   Refresh the state file with the real-world infrastructure.
-
-   ```bash
-   make refresh
-   ```
-
-6. **Destroy the Terraform-managed infrastructure:**
-
-   Remove all infrastructure managed by Terraform.
-
-   ```bash
-   make destroy
-   ```
-
-7. **Generate a graph:**
-
-   Create a visual representation of the Terraform-managed infrastructure.
-
-   ```bash
+5. **Generate the Infrastructure Graph**:
+   ```sh
    make graph
+   ```
+
+6. **Destroy the Infrastructure**:
+   ```sh
+   make destroy
    ```
